@@ -1,0 +1,213 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-primary: #0B0F19;
+  --surface-card: #161F30;
+  --surface-card-hover: #1c273d;
+  --accent-brand: #FF8A3D;
+  --accent-brand-hover: #ff9d5c;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --status-success: #00E599;
+  --accent-cyan: #38BDF8;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-highlight: rgba(255, 138, 61, 0.35);
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Typography Helpers */
+.font-mono-tech {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Tech Blueprint & Glow Backgrounds */
+.bg-tech-grid {
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(255, 138, 61, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 100% 50%, rgba(56, 189, 248, 0.06) 0%, transparent 40%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+}
+
+.glow-orange {
+  box-shadow: 0 0 35px -5px rgba(255, 138, 61, 0.25);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 30px -5px rgba(56, 189, 248, 0.2);
+}
+
+.glow-green {
+  box-shadow: 0 0 25px -4px rgba(0, 229, 153, 0.25);
+}
+
+/* Glassmorphism Styles */
+.glass-header {
+  background-color: rgba(11, 15, 25, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.glass-card {
+  background-color: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 138, 61, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(255, 138, 61, 0.12);
+}
+
+/* Postman Console Terminal Widget */
+.postman-window {
+  background-color: #0E131F;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 30px -10px rgba(255, 138, 61, 0.15);
+}
+
+.postman-titlebar {
+  background-color: #161D2C;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.postman-tab-active {
+  background-color: #0E131F;
+  color: #F1F5F9;
+  border-top: 2px solid var(--accent-brand);
+}
+
+.postman-tab-inactive {
+  background-color: transparent;
+  color: #94A3B8;
+}
+
+.postman-tab-inactive:hover {
+  color: #F1F5F9;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* HTTP Method Badges */
+.method-badge-get {
+  background-color: rgba(56, 189, 248, 0.12);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.method-badge-post {
+  background-color: rgba(255, 138, 61, 0.12);
+  color: var(--accent-brand);
+  border: 1px solid rgba(255, 138, 61, 0.3);
+}
+
+.method-badge-run {
+  background-color: rgba(0, 229, 153, 0.12);
+  color: var(--status-success);
+  border: 1px solid rgba(0, 229, 153, 0.3);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0F19;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Syntax Highlighting for JSON in Console */
+.json-key {
+  color: #38BDF8;
+}
+
+.json-string {
+  color: #A5D6FF;
+}
+
+.json-boolean {
+  color: #FF8A3D;
+}
+
+.json-number {
+  color: #00E599;
+}
+
+.json-punctuation {
+  color: #64748B;
+}
+
+/* Interactive Project Card Transitions */
+.project-card {
+  transition: opacity 0.3s ease, transform 0.3s ease, display 0.3s ease;
+}
+
+.project-card.hidden-card {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+  display: none !important;
+}
+
+/* Status Pulsing Dot */
+.pulsing-dot {
+  position: relative;
+  display: inline-flex;
+}
+
+.pulsing-dot::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 50%;
+  background-color: inherit;
+  opacity: 0.75;
+  animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* Toast Notification */
+#toast {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+#toast.toast-show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+#toast.toast-hide {
+  transform: translateY(120%);
+  opacity: 0;
+  pointer-events: none;
+}
+
