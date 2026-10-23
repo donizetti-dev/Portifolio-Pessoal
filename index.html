@@ -1,999 +1,340 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Donizetti | Analista de Automação RPA & Engenheiro de Software</title>
-  
-  <!-- SEO & Meta Tags -->
-  <meta name="description" content="Portfólio profissional de Donizetti: Analista de Automação RPA na MV3 Tecnologia e estudante de Engenharia de Software na FIAP. Soluções em RPA, Python, APIs REST e Inteligência Artificial.">
-  <meta name="theme-color" content="#0B0F19">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfólio | Sobre & Arquitetura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            'bg-primary': '#0B0F19',
-            'surface-card': '#161F30',
-            'surface-hover': '#1C273D',
-            'accent-brand': '#FF8A3D',
-            'accent-brand-hover': '#FF9D5C',
-            'text-primary': '#F1F5F9',
-            'text-secondary': '#94A3B8',
-            'status-success': '#00E599',
-            'accent-cyan': '#38BDF8',
-          },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          }
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Syne', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
         }
-      }
-    }
-  </script>
+    </script>
 
-  <!-- Google Fonts: Inter & JetBrains Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #555; }
+        ::-webkit-scrollbar-thumb:hover { background: #fff; }
 
-  <!-- Lucide Icons CDN -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+        /* Custom Cursor */
+        #cursor-dot {
+            width: 8px; height: 8px; background: #fff; border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s;
+            mix-blend-mode: difference;
+        }
+        #cursor-ring {
+            width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background-color 0.3s;
+            mix-blend-mode: difference;
+        }
+        body:hover #cursor-dot.hovered { width: 0; height: 0; }
+        body:hover #cursor-ring.hovered { width: 70px; height: 70px; background-color: #fff; }
 
-  <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="assets/css/style.css">
+        #webgl-canvas {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 1; pointer-events: none;
+        }
+        .vignette {
+            position: fixed; inset: 0; pointer-events: none; z-index: 2;
+            background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
+        }
+        .grid-bg {
+            background-size: 60px 60px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+        }
+        .content-layer { position: relative; z-index: 10; }
+
+        .marquee-text {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3.5rem, 14vw, 14rem);
+            font-weight: 800; line-height: 0.9; white-space: nowrap;
+            letter-spacing: -0.04em; user-select: none;
+        }
+        .text-outline {
+            color: transparent;
+            -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.35);
+        }
+
+        /* High Contrast Monochrome Glass Surface */
+        .glass-card {
+            background: rgba(32, 32, 32, 0.78);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+            transition: border-color 0.4s ease, transform 0.4s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.85);
+        }
+
+        #page-wrapper { will-change: transform, opacity; }
+    </style>
 </head>
+<body class="grid-bg">
 
-<body class="bg-[#0B0F19] text-[#F1F5F9] font-sans antialiased min-h-screen selection:bg-[#FF8A3D]/30 selection:text-[#FF8A3D]">
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
 
-  <!-- =========================================================================
-       HEADER / NAVBAR (Glassmorphism & Fixed)
-       ========================================================================= -->
-  <header class="fixed top-0 left-0 right-0 z-50 glass-header">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16 md:h-20">
-        
-        <!-- Logo -->
-        <a href="#" class="flex items-center gap-2 group focus:outline-none">
-          <div class="w-9 h-9 rounded-lg bg-[#161F30] border border-white/10 flex items-center justify-center text-[#FF8A3D] group-hover:border-[#FF8A3D]/50 transition-colors shadow-inner">
-            <span class="font-mono font-bold text-lg">&lt;/&gt;</span>
-          </div>
-          <span class="font-mono font-bold text-lg tracking-tight text-[#F1F5F9] group-hover:text-[#FF8A3D] transition-colors">
-            Donizetti<span class="text-[#FF8A3D]">.dev</span>
-          </span>
+    <canvas id="webgl-canvas"></canvas>
+    <div class="vignette"></div>
+
+    <!-- Header Navigation -->
+    <header class="fixed top-0 left-0 w-full z-50 px-6 md:px-12 py-6 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/15">
+        <a href="index.html" class="page-link flex items-center gap-3 interactable">
+            <div class="w-3 h-3 bg-white rotate-45 animate-pulse"></div>
+            <span class="font-display font-extrabold tracking-tighter text-xl md:text-2xl">DEV.RPA</span>
         </a>
 
-        <!-- Desktop Navigation -->
-        <nav class="hidden md:flex items-center gap-8 font-mono text-sm">
-          <a href="#sobre" class="nav-link text-[#94A3B8] hover:text-[#FF8A3D] transition-colors py-1">_sobre</a>
-          <a href="#skills" class="nav-link text-[#94A3B8] hover:text-[#FF8A3D] transition-colors py-1">_skills</a>
-          <a href="#projetos" class="nav-link text-[#94A3B8] hover:text-[#FF8A3D] transition-colors py-1">_projetos</a>
-          <a href="#experiencia" class="nav-link text-[#94A3B8] hover:text-[#FF8A3D] transition-colors py-1">_trajetória</a>
-          <a href="#contato" class="nav-link text-[#94A3B8] hover:text-[#FF8A3D] transition-colors py-1">_contato</a>
+        <nav class="flex items-center gap-6 md:gap-10 font-mono text-xs uppercase tracking-[0.22em]">
+            <a href="index.html" class="page-link interactable text-white font-bold border-b-2 border-white pb-1">01 // Sobre</a>
+            <a href="projects.html" class="page-link interactable text-white/70 hover:text-white transition-all pb-1">02 // Projetos</a>
+            <a href="skills.html" class="page-link interactable text-white/70 hover:text-white transition-all pb-1">03 // Skills</a>
         </nav>
 
-        <!-- Action Buttons -->
-        <div class="hidden md:flex items-center gap-3">
-          <a href="https://github.com/donizetti-dev" target="_blank" rel="noopener noreferrer" 
-             class="p-2 rounded-lg bg-[#161F30] border border-white/10 text-[#94A3B8] hover:text-[#F1F5F9] hover:border-white/20 transition-all"
-             title="Ver GitHub">
-            <i data-lucide="github" class="w-5 h-5"></i>
-          </a>
-          <a href="https://www.linkedin.com/in/donizetti-dev" target="_blank" rel="noopener noreferrer" 
-             class="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#FF8A3D] hover:bg-[#FF9D5C] text-white font-medium text-sm transition-all shadow-md shadow-[#FF8A3D]/20">
-            <i data-lucide="linkedin" class="w-4 h-4"></i>
-            <span>Conectar</span>
-          </a>
+        <div class="hidden sm:flex font-mono text-xs tracking-widest text-white/80 items-center gap-2">
+            <span>CORE:</span>
+            <span id="hud-state" class="text-white font-bold px-2.5 py-1 bg-white/10 border border-white/30">SOLID // 00%</span>
         </div>
+    </header>
 
-        <!-- Mobile Menu Trigger -->
-        <div class="flex md:hidden">
-          <button id="mobile-menu-btn" type="button" aria-expanded="false" aria-label="Abrir menu"
-                  class="p-2 rounded-lg bg-[#161F30] border border-white/10 text-[#94A3B8] hover:text-white focus:outline-none">
-            <i data-lucide="menu" class="w-6 h-6"></i>
-          </button>
-        </div>
+    <!-- Page Wrapper (Slides Down on Page Exit) -->
+    <div id="page-wrapper" class="content-layer">
 
-      </div>
+        <!-- HERO SECTION (3D Shatter on Scroll) -->
+        <section class="relative h-[200vh] w-full">
+            <div class="sticky top-0 h-screen w-full flex flex-col justify-center overflow-hidden">
+                <div id="marquee-1" class="marquee-text flex gap-12 items-center transform translate-x-[5%]">
+                    <span>AUTOMATE.</span>
+                    <span class="text-outline">SHATTER.</span>
+                    <span>INTEGRATE.</span>
+                    <span class="text-outline">SCALE.</span>
+                </div>
+
+                <div id="marquee-2" class="marquee-text flex gap-12 items-center transform -translate-x-[25%] mt-2">
+                    <span class="text-outline">PYTHON</span>
+                    <span>RPA ENGINE.</span>
+                    <span class="text-outline">AI AGENTS</span>
+                    <span>SYSTEMS.</span>
+                </div>
+
+                <div id="hero-caption" class="absolute bottom-16 left-1/2 -translate-x-1/2 text-center max-w-xl px-6 w-full">
+                    <p class="font-mono text-xs uppercase tracking-[0.3em] text-white/80 mb-2">
+                        [ Analista de Automação RPA & Eng. de Software ]
+                    </p>
+                    <p class="text-sm md:text-base text-white/90 font-light">
+                        Role para baixo para <span class="text-white font-semibold underline">fraturar o núcleo 3D</span> e montar minha trajetória profissional.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT SECTION (No Photos, Pure High-Contrast Architecture) -->
+        <section class="relative min-h-screen w-full py-28 px-6 md:px-16 flex items-center">
+            <div class="max-w-4xl mx-auto w-full space-y-12" id="about-block">
+                
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 border border-white/30 bg-white/10 font-mono text-xs tracking-widest uppercase">
+                    <span>01 // ARQUITETURA PESSOAL & PERFIL</span>
+                </div>
+
+                <h1 class="font-display text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.05]">
+                    UNINDO CÓDIGO, <br>
+                    <span class="text-outline">AUTOMAÇÃO DE PROCESSOS</span> & IA.
+                </h1>
+
+                <div class="glass-card p-8 md:p-12 space-y-6">
+                    <p class="text-white/90 text-lg md:text-xl leading-relaxed">
+                        Sou <strong class="text-white font-semibold underline decoration-white/40">Analista de Automação RPA na MV3 Tecnologia</strong> e estudante de <strong class="text-white font-semibold underline decoration-white/40">Engenharia de Software na FIAP</strong>, com foco no desenvolvimento de soluções que unem programação, automação de processos e integração de sistemas.
+                    </p>
+
+                    <p class="text-white/80 text-base md:text-lg leading-relaxed">
+                        Tenho experiência com <span class="text-white font-mono bg-white/10 px-2 py-0.5">Python, SQL, APIs REST, web scraping e ferramentas de RPA</span>, desenvolvendo soluções para automatizar processos, integrar sistemas e otimizar operações. Também possuo conhecimentos em desenvolvimento backend, desenvolvimento web, bancos de dados e inteligência artificial, aplicando esses conhecimentos em projetos profissionais e pessoais.
+                    </p>
+                </div>
+
+                <!-- Metrics Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="glass-card p-6">
+                        <div class="font-mono text-xs text-white/60 mb-2">ATUAÇÃO CORPORATIVA</div>
+                        <div class="font-display text-2xl font-bold">MV3 Tecnologia</div>
+                        <div class="text-sm text-white/80 mt-1 font-mono">Analista de Automação RPA</div>
+                    </div>
+                    <div class="glass-card p-6">
+                        <div class="font-mono text-xs text-white/60 mb-2">FORMAÇÃO ACADÊMICA</div>
+                        <div class="font-display text-2xl font-bold">FIAP</div>
+                        <div class="text-sm text-white/80 mt-1 font-mono">Engenharia de Software</div>
+                    </div>
+                    <div class="glass-card p-6">
+                        <div class="font-mono text-xs text-white/60 mb-2">ESPECIALIDADE CORE</div>
+                        <div class="font-display text-2xl font-bold">RPA + Backend + IA</div>
+                        <div class="text-sm text-white/80 mt-1 font-mono">Sistemas & Integrações</div>
+                    </div>
+                </div>
+
+                <div class="pt-6 flex flex-wrap gap-4">
+                    <a href="projects.html" class="page-link interactable px-8 py-4 bg-white text-black font-mono text-xs uppercase tracking-widest font-bold hover:bg-white/80 transition-all">
+                        Explorar Projetos (02) →
+                    </a>
+                    <a href="skills.html" class="page-link interactable px-8 py-4 border border-white/40 bg-white/5 text-white font-mono text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-all">
+                        Matriz de Skills (03) →
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+        <footer class="border-t border-white/20 py-12 px-6 md:px-16 bg-black/90 text-center font-mono text-xs text-white/70">
+            MV3 TECNOLOGIA • FIAP ENGENHARIA DE SOFTWARE // PORTFÓLIO MONOCROMÁTICO 3D
+        </footer>
     </div>
 
-    <!-- Mobile Drawer Navigation -->
-    <div id="mobile-menu" class="hidden md:hidden border-b border-white/10 bg-[#0E1422]/95 backdrop-blur-xl px-4 pt-3 pb-6 space-y-3 font-mono text-sm">
-      <a href="#sobre" class="block px-3 py-2 rounded-md text-[#94A3B8] hover:text-[#FF8A3D] hover:bg-[#161F30]">_sobre</a>
-      <a href="#skills" class="block px-3 py-2 rounded-md text-[#94A3B8] hover:text-[#FF8A3D] hover:bg-[#161F30]">_skills</a>
-      <a href="#projetos" class="block px-3 py-2 rounded-md text-[#94A3B8] hover:text-[#FF8A3D] hover:bg-[#161F30]">_projetos</a>
-      <a href="#experiencia" class="block px-3 py-2 rounded-md text-[#94A3B8] hover:text-[#FF8A3D] hover:bg-[#161F30]">_trajetória</a>
-      <a href="#contato" class="block px-3 py-2 rounded-md text-[#94A3B8] hover:text-[#FF8A3D] hover:bg-[#161F30]">_contato</a>
-      <div class="pt-3 border-t border-white/10 flex items-center gap-3">
-        <a href="https://github.com/donizetti-dev" target="_blank" rel="noopener noreferrer" class="flex-1 text-center py-2 rounded-lg bg-[#161F30] border border-white/10 text-sm">GitHub</a>
-        <a href="https://www.linkedin.com/in/donizetti-dev" target="_blank" rel="noopener noreferrer" class="flex-1 text-center py-2 rounded-lg bg-[#FF8A3D] text-white font-medium text-sm">LinkedIn</a>
-      </div>
-    </div>
-  </header>
-
-  <!-- =========================================================================
-       MAIN CONTENT
-       ========================================================================= -->
-  <main class="relative z-10 pt-20">
-
-    <!-- HERO SECTION -->
-    <section class="relative min-h-[90vh] flex items-center justify-center py-16 lg:py-24 bg-tech-grid overflow-hidden">
-      <!-- Ambient Radial Glows -->
-      <div class="absolute -top-32 -left-32 w-96 h-96 bg-[#FF8A3D]/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute top-1/2 -right-32 w-96 h-96 bg-[#38BDF8]/10 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          <!-- Left Column (Copywriting & CTAs) -->
-          <div class="lg:col-span-7 space-y-6 text-left">
-            
-            <!-- Status Badge -->
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#161F30] border border-white/10 text-xs font-mono text-[#94A3B8] shadow-sm">
-              <span class="w-2 h-2 rounded-full bg-[#00E599] pulsing-dot"></span>
-              <span>Status: <strong class="text-[#F1F5F9] font-medium">Operacional na MV3 Tecnologia</strong> | FIAP 2026</span>
-            </div>
-
-            <!-- Main Heading -->
-            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-extrabold tracking-tight text-[#F1F5F9] leading-tight">
-              Construindo pontes entre <br class="hidden sm:inline" />
-              <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FF8A3D] via-[#FF9D5C] to-[#38BDF8]">
-                Automação RPA
-              </span>, 
-              <span class="text-[#F1F5F9]">Backend</span> e <br class="hidden sm:inline" />
-              <span class="text-[#38BDF8]">Inteligência Artificial</span>.
-            </h1>
-
-            <!-- Subheading -->
-            <p class="text-base sm:text-lg text-[#94A3B8] max-w-2xl leading-relaxed">
-              Desenvolvo robôs resilientes, APIs robustas e integrações inteligentes que transformam processos manuais em operações eficientes.
-            </p>
-
-            <!-- Action CTAs -->
-            <div class="flex flex-wrap items-center gap-4 pt-2">
-              <a href="#projetos" 
-                 class="px-6 py-3.5 rounded-xl bg-[#FF8A3D] hover:bg-[#FF9D5C] text-white font-semibold text-sm tracking-wide transition-all shadow-lg shadow-[#FF8A3D]/25 flex items-center gap-2 group">
-                <span>Ver Projetos</span>
-                <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
-              </a>
-
-              <a href="https://www.linkedin.com/in/donizetti-dev" target="_blank" rel="noopener noreferrer"
-                 class="px-6 py-3.5 rounded-xl bg-[#161F30]/80 hover:bg-[#1E2B42] text-[#F1F5F9] border border-white/10 hover:border-white/20 font-medium text-sm transition-all flex items-center gap-2">
-                <i data-lucide="linkedin" class="w-4 h-4 text-[#38BDF8]"></i>
-                <span>Conectar no LinkedIn</span>
-              </a>
-            </div>
-
-            <!-- Quick Tech Highlights -->
-            <div class="pt-6 grid grid-cols-3 gap-4 border-t border-white/10 max-w-xl">
-              <div>
-                <p class="text-xs text-[#94A3B8] font-mono">LATÊNCIA MÉDIA</p>
-                <p class="text-lg font-bold font-mono text-[#00E599] mt-0.5">&lt; 50ms</p>
-              </div>
-              <div>
-                <p class="text-xs text-[#94A3B8] font-mono">RESILIÊNCIA</p>
-                <p class="text-lg font-bold font-mono text-[#38BDF8] mt-0.5">99.9% Up</p>
-              </div>
-              <div>
-                <p class="text-xs text-[#94A3B8] font-mono">ENGENHARIA</p>
-                <p class="text-lg font-bold font-mono text-[#FF8A3D] mt-0.5">Code-First</p>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Right Column: Interactive Postman Console Window -->
-          <div class="lg:col-span-5">
-            <div class="postman-window w-full">
-              
-              <!-- Postman Window Titlebar -->
-              <div class="postman-titlebar px-4 py-3 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span class="w-3 h-3 rounded-full bg-[#EF4444] inline-block opacity-80"></span>
-                  <span class="w-3 h-3 rounded-full bg-[#F59E0B] inline-block opacity-80"></span>
-                  <span class="w-3 h-3 rounded-full bg-[#10B981] inline-block opacity-80"></span>
-                  <span class="ml-2 text-xs font-mono text-[#94A3B8] flex items-center gap-1.5">
-                    <i data-lucide="terminal" class="w-3.5 h-3.5 text-[#FF8A3D]"></i>
-                    Postman API Preview
-                  </span>
-                </div>
-                <span class="text-[10px] font-mono bg-white/5 px-2 py-0.5 rounded text-[#94A3B8]">v1.0.4</span>
-              </div>
-
-              <!-- Postman Request Tab -->
-              <div class="flex items-center bg-[#131926] px-3 pt-2 border-b border-white/10 text-xs font-mono">
-                <div class="px-3 py-1.5 rounded-t bg-[#0E131F] text-white border-t-2 border-[#FF8A3D] flex items-center gap-2">
-                  <span class="text-[#38BDF8] font-bold">GET</span>
-                  <span class="truncate max-w-[160px] sm:max-w-xs">/api/v1/engineer/donizetti</span>
-                  <i data-lucide="x" class="w-3 h-3 text-[#94A3B8] hover:text-white cursor-pointer ml-1"></i>
-                </div>
-                <div class="px-2 text-[#94A3B8] hover:text-white cursor-pointer ml-1">
-                  <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                </div>
-              </div>
-
-              <!-- Postman URL Input Bar -->
-              <div class="p-3 bg-[#0E131F] border-b border-white/10 flex items-center gap-2">
-                <div class="flex-1 flex items-center bg-[#161F30] border border-white/10 rounded-lg overflow-hidden px-3 py-1.5 focus-within:border-[#FF8A3D]/50 transition-colors">
-                  <span class="text-[#38BDF8] font-mono font-bold text-xs mr-2">GET</span>
-                  <input type="text" readonly value="https://api.donizetti.dev/v1/engineer/donizetti" 
-                         class="w-full bg-transparent border-0 p-0 text-xs font-mono text-[#F1F5F9] focus:outline-none selection:bg-[#FF8A3D]/30" />
-                </div>
-                <button id="postman-send-btn" type="button" 
-                        class="px-4 py-1.5 bg-[#FF8A3D] hover:bg-[#FF9D5C] active:scale-95 text-white font-mono font-semibold text-xs rounded-lg transition-all flex items-center gap-1.5 shadow-sm">
-                  <i data-lucide="send" class="w-3.5 h-3.5"></i>
-                  <span>Send</span>
-                </button>
-              </div>
-
-              <!-- Request Sub-Tabs -->
-              <div class="flex items-center px-3 border-b border-white/5 bg-[#111724] text-[11px] font-mono">
-                <button type="button" data-postman-tab="body" class="px-3 py-1.5 postman-tab-active font-medium">Body</button>
-                <button type="button" data-postman-tab="headers" class="px-3 py-1.5 postman-tab-inactive">Headers <span class="text-[9px] bg-white/10 px-1 py-0.2 rounded ml-0.5">6</span></button>
-                <button type="button" data-postman-tab="params" class="px-3 py-1.5 postman-tab-inactive">Params</button>
-              </div>
-
-              <!-- Response Info Bar -->
-              <div class="px-4 py-2 bg-[#0E131F] border-b border-white/5 flex items-center justify-between text-xs font-mono">
-                <div class="flex items-center gap-4">
-                  <span class="text-[#94A3B8]">Status:</span>
-                  <span id="postman-status-badge" class="text-[#00E599] font-bold flex items-center">
-                    <span class="w-2 h-2 rounded-full bg-[#00E599] inline-block mr-1.5"></span>
-                    200 OK
-                  </span>
-                  <span class="text-[#94A3B8]">Time: <strong id="postman-time-badge" class="text-[#F1F5F9] font-normal">42 ms</strong></span>
-                  <span class="text-[#94A3B8] hidden sm:inline">Size: <strong id="postman-size-badge" class="text-[#F1F5F9] font-normal">684 B</strong></span>
-                </div>
-                <button id="postman-copy-btn" type="button" class="text-[#94A3B8] hover:text-white flex items-center gap-1 text-[11px]" title="Copiar Resposta JSON">
-                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                  <span class="hidden sm:inline">Copy</span>
-                </button>
-              </div>
-
-              <!-- Postman Panels -->
-              <div class="p-4 bg-[#090D15] min-h-[220px] max-h-[300px] overflow-y-auto font-mono text-xs leading-relaxed">
-                <!-- Panel 1: JSON Body -->
-                <div data-postman-panel="body">
-                  <pre id="postman-json-output" class="text-xs transition-opacity duration-200"></pre>
-                </div>
-
-                <!-- Panel 2: Headers -->
-                <div data-postman-panel="headers" class="hidden space-y-2 text-xs">
-                  <div class="flex justify-between border-b border-white/5 pb-1"><span class="text-[#38BDF8]">Content-Type:</span><span class="text-[#94A3B8]">application/json; charset=utf-8</span></div>
-                  <div class="flex justify-between border-b border-white/5 pb-1"><span class="text-[#38BDF8]">X-Engine:</span><span class="text-[#94A3B8]">Python 3.12 / FastAPI</span></div>
-                  <div class="flex justify-between border-b border-white/5 pb-1"><span class="text-[#38BDF8]">X-RPA-Runtime:</span><span class="text-[#94A3B8]">AutoMate + Power Automate</span></div>
-                  <div class="flex justify-between border-b border-white/5 pb-1"><span class="text-[#38BDF8]">X-Institution:</span><span class="text-[#94A3B8]">FIAP Software Engineering</span></div>
-                  <div class="flex justify-between border-b border-white/5 pb-1"><span class="text-[#38BDF8]">Cache-Control:</span><span class="text-[#94A3B8]">no-cache, private</span></div>
-                  <div class="flex justify-between"><span class="text-[#38BDF8]">Server:</span><span class="text-[#94A3B8]">uvicorn / v0-edge</span></div>
-                </div>
-
-                <!-- Panel 3: Params -->
-                <div data-postman-panel="params" class="hidden text-xs text-[#94A3B8]">
-                  <p class="text-xs mb-2 text-[#F1F5F9]">Query Parameters:</p>
-                  <div class="grid grid-cols-2 gap-2 bg-[#161F30] p-2 rounded border border-white/5">
-                    <span class="text-[#38BDF8]">view</span>
-                    <span>detailed</span>
-                    <span class="text-[#38BDF8]">include_skills</span>
-                    <span>true</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Postman Bottom Status Bar -->
-              <div class="px-4 py-1.5 bg-[#161D2C] border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-[#94A3B8]">
-                <div class="flex items-center gap-2">
-                  <span class="text-[#00E599]">●</span>
-                  <span>Console Online</span>
-                </div>
-                <span>JSON (Pretty)</span>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         SECTION: SOBRE MIM
-         ========================================================================= -->
-    <section id="sobre" class="py-20 border-t border-white/10 bg-[#0B0F19] relative">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <!-- Section Header -->
-        <div class="flex flex-col items-start space-y-2 mb-12">
-          <div class="inline-flex items-center gap-2 text-xs font-mono text-[#FF8A3D] uppercase tracking-wider">
-            <span class="w-2 h-2 rounded-full bg-[#FF8A3D]"></span>
-            01. Trajetória & Contexto
-          </div>
-          <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#F1F5F9]">
-            Engenharia de Software aliada à Automação Corporativa
-          </h2>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          <!-- Bio & Story -->
-          <div class="lg:col-span-7 space-y-6">
-            <div class="glass-card rounded-2xl p-6 sm:p-8 space-y-4">
-              <h3 class="text-lg font-semibold text-[#F1F5F9] flex items-center gap-2">
-                <i data-lucide="user-check" class="w-5 h-5 text-[#FF8A3D]"></i>
-                Perfil Executivo
-              </h3>
-              <p class="text-[#94A3B8] leading-relaxed text-sm sm:text-base">
-                Analista de Automação RPA na <strong class="text-[#F1F5F9]">MV3 Tecnologia</strong> e estudante de <strong class="text-[#F1F5F9]">Engenharia de Software na FIAP</strong>, com foco no desenvolvimento de soluções que unem programação, automação de processos e integração de sistemas.
-              </p>
-              <p class="text-[#94A3B8] leading-relaxed text-sm sm:text-base">
-                Possui sólida experiência com <span class="text-[#38BDF8] font-mono">Python</span>, <span class="text-[#38BDF8] font-mono">SQL</span>, <span class="text-[#38BDF8] font-mono">APIs REST</span>, web scraping e ferramentas de RPA corporativas, além de vivência prática em desenvolvimento backend, IA generativa e bancos de dados relacionais.
-              </p>
-              
-              <div class="pt-4 border-t border-white/10 flex flex-wrap gap-2 text-xs font-mono">
-                <span class="px-2.5 py-1 rounded bg-[#161F30] text-[#38BDF8] border border-[#38BDF8]/20">#RPADeveloper</span>
-                <span class="px-2.5 py-1 rounded bg-[#161F30] text-[#FF8A3D] border border-[#FF8A3D]/20">#SoftwareEngineering</span>
-                <span class="px-2.5 py-1 rounded bg-[#161F30] text-[#00E599] border border-[#00E599]/20">#PythonBackend</span>
-                <span class="px-2.5 py-1 rounded bg-[#161F30] text-[#F1F5F9] border border-white/10">#FIAP2026</span>
-              </div>
-            </div>
-
-            <!-- Destaque de Atuação -->
-            <div class="glass-card rounded-2xl p-6 border-l-4 border-l-[#FF8A3D]">
-              <h4 class="text-sm font-semibold font-mono text-[#F1F5F9] uppercase tracking-wider mb-2 flex items-center gap-2">
-                <i data-lucide="cpu" class="w-4 h-4 text-[#FF8A3D]"></i>
-                Diferencial de Abordagem Técnica
-              </h4>
-              <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
-                Diferente de automações puramente "no-code" ou frágeis a alterações visuais, minha metodologia foca em engenharia de resiliência: tratamento avançado de exceções, esteiras de reconexão de banco de dados, idempotência de execuções e APIs REST documentadas para orquestração.
-              </p>
-            </div>
-          </div>
-
-          <!-- Metrics & Stats Cards -->
-          <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-            
-            <!-- Metric 1 -->
-            <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
-              <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-[#FF8A3D]/10 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-mono text-[#94A3B8]">ENTREGAS</span>
-                <i data-lucide="layers" class="w-5 h-5 text-[#FF8A3D]"></i>
-              </div>
-              <div class="text-3xl sm:text-4xl font-extrabold font-mono text-[#F1F5F9]">+5 Projetos</div>
-              <p class="text-xs text-[#94A3B8] mt-1">Sistemas e microsserviços chave implementados com sucesso</p>
-            </div>
-
-            <!-- Metric 2 -->
-            <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
-              <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-[#00E599]/10 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-mono text-[#94A3B8]">PRODUÇÃO CONTÍNUA</span>
-                <i data-lucide="bot" class="w-5 h-5 text-[#00E599]"></i>
-              </div>
-              <div class="text-3xl sm:text-4xl font-extrabold font-mono text-[#F1F5F9]">Dezenas</div>
-              <p class="text-xs text-[#94A3B8] mt-1">Rotinas automatizadas em operação diária para clientes corporativos</p>
-            </div>
-
-            <!-- Metric 3 -->
-            <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
-              <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-[#38BDF8]/10 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-mono text-[#94A3B8]">QUALIDADE DE CÓDIGO</span>
-                <i data-lucide="shield-check" class="w-5 h-5 text-[#38BDF8]"></i>
-              </div>
-              <div class="text-3xl sm:text-4xl font-extrabold font-mono text-[#F1F5F9]">100% Foco</div>
-              <p class="text-xs text-[#94A3B8] mt-1">Soluções com alta disponibilidade, resiliência e integridade transacional</p>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         SECTION: SKILLS & STACK TECNOLÓGICA (4 PILARES)
-         ========================================================================= -->
-    <section id="skills" class="py-20 border-t border-white/10 bg-[#0E131F] relative">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <!-- Section Header -->
-        <div class="flex flex-col items-start space-y-2 mb-12">
-          <div class="inline-flex items-center gap-2 text-xs font-mono text-[#38BDF8] uppercase tracking-wider">
-            <span class="w-2 h-2 rounded-full bg-[#38BDF8]"></span>
-            02. Competências Técnicas
-          </div>
-          <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#F1F5F9]">
-            Stack Tecnológica & Pilares de Engenharia
-          </h2>
-          <p class="text-sm text-[#94A3B8] max-w-2xl">
-            Arquitetura dividida em 4 eixos principais para sustentar automações complexas e aplicações de alta escala.
-          </p>
-        </div>
-
-        <!-- Grid of 4 Pillars -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          <!-- Pillar 1: Automação & Web Scraping -->
-          <div class="glass-card rounded-2xl p-6 hover:border-[#FF8A3D]/40 transition-all">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-10 h-10 rounded-xl bg-[#FF8A3D]/10 border border-[#FF8A3D]/30 flex items-center justify-center text-[#FF8A3D]">
-                <i data-lucide="bot" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <h3 class="text-lg font-bold text-[#F1F5F9]">Automação & Web Scraping</h3>
-                <span class="text-xs font-mono text-[#94A3B8]">RPA Corporativo & Extração</span>
-              </div>
-            </div>
-            <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed mb-4">
-              Engenharia de robôs resilientes para automação de portais governamentais, sistemas legados, páginas dinâmicas e processamento de fluxos empresariais.
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">Selenium</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">Playwright</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">AutoMate Desktop / Enterprise</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">Power Automate Desktop</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#FF8A3D]">Web Scraping Avançado</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#00E599]">Pipelines RPA</span>
-            </div>
-          </div>
-
-          <!-- Pillar 2: Backend & APIs -->
-          <div class="glass-card rounded-2xl p-6 hover:border-[#38BDF8]/40 transition-all">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-10 h-10 rounded-xl bg-[#38BDF8]/10 border border-[#38BDF8]/30 flex items-center justify-center text-[#38BDF8]">
-                <i data-lucide="server" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <h3 class="text-lg font-bold text-[#F1F5F9]">Backend & APIs</h3>
-                <span class="text-xs font-mono text-[#94A3B8]">Microsserviços & RESTful</span>
-              </div>
-            </div>
-            <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed mb-4">
-              Criação e consumo de endpoints REST padronizados, validação estrita de esquemas de dados, orquestração de webhooks e conectividade segura.
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#38BDF8]">Python</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">FastAPI</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">Flask</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">Arquitetura RESTful</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">Pydantic</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#38BDF8]">Webhooks & Microsserviços</span>
-            </div>
-          </div>
-
-          <!-- Pillar 3: Bancos de Dados & Processamento -->
-          <div class="glass-card rounded-2xl p-6 hover:border-[#00E599]/40 transition-all">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-10 h-10 rounded-xl bg-[#00E599]/10 border border-[#00E599]/30 flex items-center justify-center text-[#00E599]">
-                <i data-lucide="database" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <h3 class="text-lg font-bold text-[#F1F5F9]">Bancos de Dados & Processamento</h3>
-                <span class="text-xs font-mono text-[#94A3B8]">Persistência & ETL de Dados</span>
-              </div>
-            </div>
-            <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed mb-4">
-              Modelagem relacional, reconciliação de informações contábeis/financeiras, manipulação de grandes massas de planilhas e extração em PDFs.
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#00E599]">Microsoft SQL Server</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">SSMS</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">SQLite</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">Modelagem Relacional</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#38BDF8]">Pandas</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">PDFPlumber & OpenPyXL</span>
-            </div>
-          </div>
-
-          <!-- Pillar 4: Inteligência Artificial & Web -->
-          <div class="glass-card rounded-2xl p-6 hover:border-[#FF8A3D]/40 transition-all">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
-                <i data-lucide="sparkles" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <h3 class="text-lg font-bold text-[#F1F5F9]">Inteligência Artificial & Web</h3>
-                <span class="text-xs font-mono text-[#94A3B8]">GenAI & Frontend Moderno</span>
-              </div>
-            </div>
-            <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed mb-4">
-              Integração de LLMs em fluxos analíticos de documentos, automações RAG cognitivas aliadas a interfaces frontend limpas e conteinerização.
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-purple-500/30 text-xs font-mono text-purple-300">Google Gemini API</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">IA Generativa em Documentos</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#38BDF8]">React & JavaScript ES6+</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">HTML5 / Tailwind CSS</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#F1F5F9]">Docker</span>
-              <span class="px-2.5 py-1 rounded-md bg-[#161F30] border border-white/10 text-xs font-mono text-[#FF8A3D]">Git / GitHub</span>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         SECTION: PROJETOS EM DESTAQUE (ESTILO POSTMAN / TECH CARDS)
-         ========================================================================= -->
-    <section id="projetos" class="py-20 border-t border-white/10 bg-[#0B0F19] relative">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <!-- Section Header -->
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
-          <div class="space-y-2">
-            <div class="inline-flex items-center gap-2 text-xs font-mono text-[#00E599] uppercase tracking-wider">
-              <span class="w-2 h-2 rounded-full bg-[#00E599]"></span>
-              03. Casos Reais & Engenharia
-            </div>
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#F1F5F9]">
-              Projetos em Destaque
-            </h2>
-            <p class="text-sm text-[#94A3B8] max-w-xl">
-              Coleção de soluções em produção e protótipos de alta fidelidade técnica documentados no formato de endpoints de API.
-            </p>
-          </div>
-
-          <!-- Interactive Category Filters -->
-          <div class="flex flex-wrap items-center gap-2 bg-[#0E131F] p-1.5 rounded-xl border border-white/10 text-xs font-mono">
-            <button type="button" data-filter-btn="all" 
-                    class="px-3.5 py-1.5 rounded-lg bg-[#FF8A3D] text-white font-medium transition-all shadow-md shadow-[#FF8A3D]/20">
-              Todos
-            </button>
-            <button type="button" data-filter-btn="rpa" 
-                    class="px-3.5 py-1.5 rounded-lg bg-[#161F30] text-[#94A3B8] hover:text-white transition-all border border-white/5">
-              RPA & Automação
-            </button>
-            <button type="button" data-filter-btn="backend" 
-                    class="px-3.5 py-1.5 rounded-lg bg-[#161F30] text-[#94A3B8] hover:text-white transition-all border border-white/5">
-              APIs & Backend
-            </button>
-            <button type="button" data-filter-btn="ai" 
-                    class="px-3.5 py-1.5 rounded-lg bg-[#161F30] text-[#94A3B8] hover:text-white transition-all border border-white/5">
-              Inteligência Artificial
-            </button>
-          </div>
-        </div>
-
-        <!-- Projects Grid -->
-        <div id="projects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          
-          <!-- PROJECT 1: News Scraper API -->
-          <article data-project-category="backend,rpa" 
-                   class="project-card glass-card rounded-2xl flex flex-col justify-between overflow-hidden p-6 border border-white/10 hover:border-[#38BDF8]/50">
-            <div>
-              <!-- Top Method Header & Copy Endpoint -->
-              <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2">
-                  <span class="method-badge-get px-2.5 py-0.5 rounded text-xs font-mono font-bold">GET</span>
-                  <span class="font-mono text-xs text-[#94A3B8]">/api/v1/news</span>
-                </div>
-                <button type="button" data-copy-endpoint="GET /api/v1/news" title="Copiar Endpoint" 
-                        class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#94A3B8] hover:text-[#38BDF8] transition-colors">
-                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                </button>
-              </div>
-
-              <div class="mb-2">
-                <span class="text-[11px] font-mono text-[#38BDF8] uppercase tracking-wider font-semibold">Backend & Web Scraping</span>
-                <h3 class="text-lg font-bold text-[#F1F5F9] mt-0.5">News Scraper API</h3>
-              </div>
-
-              <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed mb-6">
-                API de alta performance desenvolvida para raspagem automatizada, persistência relacional e entrega estruturada de notícias do portal G1 com paginação e busca por títulos.
-              </p>
-            </div>
-
-            <div>
-              <!-- Stack Tags -->
-              <div class="flex flex-wrap gap-1.5 mb-5 pt-4 border-t border-white/10 text-[11px] font-mono">
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#38BDF8] border border-white/5">Python</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#F1F5F9] border border-white/5">Flask</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#F1F5F9] border border-white/5">Selenium</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#00E599] border border-white/5">SQL Server</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#F1F5F9] border border-white/5">REST API</span>
-              </div>
-
-              <!-- Action Links -->
-              <div class="flex items-center justify-between pt-2">
-                <span class="inline-flex items-center gap-1.5 text-xs font-mono text-[#00E599]">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#00E599]"></span>
-                  200 OK
-                </span>
-                <a href="https://github.com/donizetti-dev" target="_blank" rel="noopener noreferrer" 
-                   class="text-xs font-mono text-[#FF8A3D] hover:underline flex items-center gap-1">
-                  <span>Ver Código</span>
-                  <i data-lucide="external-link" class="w-3 h-3"></i>
-                </a>
-              </div>
-            </div>
-          </article>
-
-          <!-- PROJECT 2: Trending Movies -->
-          <article data-project-category="backend" 
-                   class="project-card glass-card rounded-2xl flex flex-col justify-between overflow-hidden p-6 border border-white/10 hover:border-[#38BDF8]/50">
-            <div>
-              <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2">
-                  <span class="method-badge-get px-2.5 py-0.5 rounded text-xs font-mono font-bold">GET</span>
-                  <span class="font-mono text-xs text-[#94A3B8]">/api/v1/movies/trending</span>
-                </div>
-                <button type="button" data-copy-endpoint="GET /api/v1/movies/trending" title="Copiar Endpoint" 
-                        class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#94A3B8] hover:text-[#38BDF8] transition-colors">
-                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                </button>
-              </div>
-
-              <div class="mb-2">
-                <span class="text-[11px] font-mono text-[#FF8A3D] uppercase tracking-wider font-semibold">Frontend & Integração</span>
-                <h3 class="text-lg font-bold text-[#F1F5F9] mt-0.5">Trending Movies</h3>
-              </div>
-
-              <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed mb-6">
-                Plataforma web responsiva para exibição de tendências cinematográficas consumindo a API do TMDB em tempo real, construída sob conceitos de Spec-Driven Development.
-              </p>
-            </div>
-
-            <div>
-              <div class="flex flex-wrap gap-1.5 mb-5 pt-4 border-t border-white/10 text-[11px] font-mono">
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#38BDF8] border border-white/5">React</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#F1F5F9] border border-white/5">JavaScript</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#F1F5F9] border border-white/5">TMDB API</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#FF8A3D] border border-white/5">Vercel</span>
-              </div>
-
-              <div class="flex items-center justify-between pt-2">
-                <span class="inline-flex items-center gap-1.5 text-xs font-mono text-[#00E599]">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#00E599]"></span>
-                  200 OK
-                </span>
-                <a href="https://github.com/donizetti-dev" target="_blank" rel="noopener noreferrer" 
-                   class="text-xs font-mono text-[#FF8A3D] hover:underline flex items-center gap-1">
-                  <span>Ver no GitHub</span>
-                  <i data-lucide="external-link" class="w-3 h-3"></i>
-                </a>
-              </div>
-            </div>
-          </article>
-
-          <!-- PROJECT 3: Assistente de IA com Gemini -->
-          <article data-project-category="ai" 
-                   class="project-card glass-card rounded-2xl flex flex-col justify-between overflow-hidden p-6 border border-white/10 hover:border-purple-500/50">
-            <div>
-              <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2">
-                  <span class="method-badge-post px-2.5 py-0.5 rounded text-xs font-mono font-bold">POST</span>
-                  <span class="font-mono text-xs text-[#94A3B8]">/api/v1/ai/query</span>
-                </div>
-                <button type="button" data-copy-endpoint="POST /api/v1/ai/query" title="Copiar Endpoint" 
-                        class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#94A3B8] hover:text-[#FF8A3D] transition-colors">
-                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                </button>
-              </div>
-
-              <div class="mb-2">
-                <span class="text-[11px] font-mono text-purple-400 uppercase tracking-wider font-semibold">Inteligência Artificial</span>
-                <h3 class="text-lg font-bold text-[#F1F5F9] mt-0.5">Assistente de IA com Gemini</h3>
-              </div>
-
-              <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed mb-6">
-                Aplicação RAG e assistente inteligente para interpretação e resposta contextualizada sobre documentos e regulamentos institucionais usando a API do Google Gemini.
-              </p>
-            </div>
-
-            <div>
-              <div class="flex flex-wrap gap-1.5 mb-5 pt-4 border-t border-white/10 text-[11px] font-mono">
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-purple-300 border border-purple-500/20">Google Gemini API</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#38BDF8] border border-white/5">Python</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#F1F5F9] border border-white/5">FastAPI</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#F1F5F9] border border-white/5">Document Parsing</span>
-              </div>
-
-              <div class="flex items-center justify-between pt-2">
-                <span class="inline-flex items-center gap-1.5 text-xs font-mono text-[#00E599]">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#00E599]"></span>
-                  201 Created
-                </span>
-                <a href="https://github.com/donizetti-dev" target="_blank" rel="noopener noreferrer" 
-                   class="text-xs font-mono text-[#FF8A3D] hover:underline flex items-center gap-1">
-                  <span>Ver Detalhes</span>
-                  <i data-lucide="external-link" class="w-3 h-3"></i>
-                </a>
-              </div>
-            </div>
-          </article>
-
-          <!-- PROJECT 4: InfraWatch — FIAP Global Solution -->
-          <article data-project-category="backend" 
-                   class="project-card glass-card rounded-2xl flex flex-col justify-between overflow-hidden p-6 border border-white/10 hover:border-[#38BDF8]/50">
-            <div>
-              <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2">
-                  <span class="method-badge-post px-2.5 py-0.5 rounded text-xs font-mono font-bold">POST</span>
-                  <span class="font-mono text-xs text-[#94A3B8]">/api/v1/monitor/telemetry</span>
-                </div>
-                <button type="button" data-copy-endpoint="POST /api/v1/monitor/telemetry" title="Copiar Endpoint" 
-                        class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#94A3B8] hover:text-[#FF8A3D] transition-colors">
-                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                </button>
-              </div>
-
-              <div class="mb-2">
-                <span class="text-[11px] font-mono text-[#00E599] uppercase tracking-wider font-semibold">Engenharia de Dados & IoT</span>
-                <h3 class="text-lg font-bold text-[#F1F5F9] mt-0.5">InfraWatch — FIAP GS</h3>
-              </div>
-
-              <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed mb-6">
-                Plataforma de monitoramento geoambiental e mitigação de catástrofes, agregando telemetria de sensores de campo e cruzamento analítico com dados orbitais.
-              </p>
-            </div>
-
-            <div>
-              <div class="flex flex-wrap gap-1.5 mb-5 pt-4 border-t border-white/10 text-[11px] font-mono">
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#38BDF8] border border-white/5">Python</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#00E599] border border-white/5">Processamento Dados</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#F1F5F9] border border-white/5">APIs de Sensores</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#FF8A3D] border border-white/5">FIAP GS</span>
-              </div>
-
-              <div class="flex items-center justify-between pt-2">
-                <span class="inline-flex items-center gap-1.5 text-xs font-mono text-[#00E599]">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#00E599]"></span>
-                  200 OK
-                </span>
-                <a href="https://github.com/donizetti-dev" target="_blank" rel="noopener noreferrer" 
-                   class="text-xs font-mono text-[#FF8A3D] hover:underline flex items-center gap-1">
-                  <span>Ver Solução</span>
-                  <i data-lucide="external-link" class="w-3 h-3"></i>
-                </a>
-              </div>
-            </div>
-          </article>
-
-          <!-- PROJECT 5: Automações RPA Corporativas — MV3 Tecnologia -->
-          <article data-project-category="rpa" 
-                   class="project-card glass-card rounded-2xl flex flex-col justify-between overflow-hidden p-6 border border-white/10 hover:border-[#00E599]/50 md:col-span-2 lg:col-span-2">
-            <div>
-              <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2">
-                  <span class="method-badge-run px-2.5 py-0.5 rounded text-xs font-mono font-bold">RUN</span>
-                  <span class="font-mono text-xs text-[#94A3B8]">/rpa/pipeline/process</span>
-                </div>
-                <button type="button" data-copy-endpoint="RUN /rpa/pipeline/process" title="Copiar Comando" 
-                        class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#94A3B8] hover:text-[#00E599] transition-colors">
-                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                </button>
-              </div>
-
-              <div class="mb-2">
-                <span class="text-[11px] font-mono text-[#00E599] uppercase tracking-wider font-semibold">RPA Corporativo & Sustentação</span>
-                <h3 class="text-xl font-bold text-[#F1F5F9] mt-0.5">Automações RPA Corporativas — MV3 Tecnologia</h3>
-              </div>
-
-              <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed mb-6">
-                Desenvolvimento e sustentação contínua de robôs para grandes operações corporativas: extração em portais governamentais, validação contábil, reconciliação de informações em Microsoft SQL Server e disparo de notificações automáticas.
-              </p>
-            </div>
-
-            <div>
-              <div class="flex flex-wrap gap-1.5 mb-5 pt-4 border-t border-white/10 text-[11px] font-mono">
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#38BDF8] border border-white/5">Python</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#00E599] border border-white/5">AutoMate Enterprise</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#F1F5F9] border border-white/5">Power Automate</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#F1F5F9] border border-white/5">Selenium</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#F1F5F9] border border-white/5">SQL Server</span>
-                <span class="px-2 py-0.5 rounded bg-[#161F30] text-[#FF8A3D] border border-white/5">PowerShell</span>
-              </div>
-
-              <div class="flex items-center justify-between pt-2">
-                <span class="inline-flex items-center gap-1.5 text-xs font-mono text-[#00E599]">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#00E599] pulsing-dot"></span>
-                  Operacional em Produção
-                </span>
-                <a href="#contato" class="text-xs font-mono text-[#FF8A3D] hover:underline flex items-center gap-1">
-                  <span>Saber Mais</span>
-                  <i data-lucide="arrow-right" class="w-3 h-3"></i>
-                </a>
-              </div>
-            </div>
-          </article>
-
-        </div>
-
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         SECTION: TRAJETÓRIA, FORMAÇÃO E EVENTOS (SYSTEM EXECUTION LOG)
-         ========================================================================= -->
-    <section id="experiencia" class="py-20 border-t border-white/10 bg-[#0E131F] relative">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <!-- Section Header -->
-        <div class="flex flex-col items-start space-y-2 mb-12">
-          <div class="inline-flex items-center gap-2 text-xs font-mono text-[#FF8A3D] uppercase tracking-wider">
-            <span class="w-2 h-2 rounded-full bg-[#FF8A3D]"></span>
-            04. Histórico & Conexões
-          </div>
-          <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-[#F1F5F9]">
-            Linha do Tempo (Execution Log)
-          </h2>
-          <p class="text-sm text-[#94A3B8]">
-            Marcos profissionais, trajetória acadêmica e eventos de imersão tecnológica.
-          </p>
-        </div>
-
-        <!-- Terminal Timeline -->
-        <div class="relative border-l-2 border-white/10 ml-3 sm:ml-6 pl-6 sm:pl-8 space-y-10">
-          
-          <!-- Timeline Item 1 -->
-          <div class="relative group">
-            <div class="absolute -left-[31px] sm:-left-[39px] top-1 w-4 h-4 rounded-full bg-[#00E599] border-4 border-[#0E131F] shadow-sm"></div>
-            
-            <div class="glass-card rounded-2xl p-6 border border-white/10">
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-2 font-mono text-xs">
-                <span class="text-[#00E599] font-bold">[2026 — PRESENTE]</span>
-                <span class="text-[#94A3B8] bg-white/5 px-2.5 py-0.5 rounded">RPA Execution Pipeline</span>
-              </div>
-              <h3 class="text-lg font-bold text-[#F1F5F9]">Analista de Automação RPA</h3>
-              <p class="text-sm font-medium text-[#FF8A3D] mb-3">MV3 Tecnologia</p>
-              <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
-                Desenvolvimento, orquestração e sustentação de robôs e automações críticas em larga escala. Integração com bancos de dados relacionais Microsoft SQL Server, rotinas de conciliação financeira, monitoramento contínuo de jobs e tratamento preventivo de anomalias em fluxos corporativos.
-              </p>
-            </div>
-          </div>
-
-          <!-- Timeline Item 2 -->
-          <div class="relative group">
-            <div class="absolute -left-[31px] sm:-left-[39px] top-1 w-4 h-4 rounded-full bg-[#38BDF8] border-4 border-[#0E131F] shadow-sm"></div>
-            
-            <div class="glass-card rounded-2xl p-6 border border-white/10">
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-2 font-mono text-xs">
-                <span class="text-[#38BDF8] font-bold">[2024 — PRESENTE]</span>
-                <span class="text-[#94A3B8] bg-white/5 px-2.5 py-0.5 rounded">Higher Education</span>
-              </div>
-              <h3 class="text-lg font-bold text-[#F1F5F9]">Graduação em Engenharia de Software</h3>
-              <p class="text-sm font-medium text-[#38BDF8] mb-3">FIAP — Faculdade de Informática e Administração Paulista</p>
-              <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
-                Formação com ênfase em arquitetura de microsserviços, modelagem avançada de dados relacionais, DevOps, governança de APIs e implementação prática de Inteligência Artificial Generativa em projetos institucionais.
-              </p>
-            </div>
-          </div>
-
-          <!-- Timeline Item 3: Eventos & Conferências -->
-          <div class="relative group">
-            <div class="absolute -left-[31px] sm:-left-[39px] top-1 w-4 h-4 rounded-full bg-[#FF8A3D] border-4 border-[#0E131F] shadow-sm"></div>
-            
-            <div class="glass-card rounded-2xl p-6 border border-white/10">
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-2 font-mono text-xs">
-                <span class="text-[#FF8A3D] font-bold">[EVENTOS & CONFERÊNCIAS]</span>
-                <span class="text-[#94A3B8] bg-white/5 px-2.5 py-0.5 rounded">Tech Summits & Networking</span>
-              </div>
-              <h3 class="text-lg font-bold text-[#F1F5F9] mb-4">Imersões e Comunidade Tecnológica</h3>
-              
-              <ul class="space-y-3 text-xs sm:text-sm text-[#94A3B8]">
-                <li class="flex items-start gap-2.5">
-                  <i data-lucide="sparkle" class="w-4 h-4 text-[#FF8A3D] shrink-0 mt-0.5"></i>
-                  <span><strong class="text-[#F1F5F9]">Encontro Especial pós-Intelligent Automation Summit Rio de Janeiro 2026:</strong> Participação e discussões aprofundadas sobre o futuro do RPA, Hiperautomação e IA Agêntica.</span>
-                </li>
-                <li class="flex items-start gap-2.5">
-                  <i data-lucide="sparkle" class="w-4 h-4 text-[#38BDF8] shrink-0 mt-0.5"></i>
-                  <span><strong class="text-[#F1F5F9]">Connect_Summit — FIAP:</strong> Hackathons, workshops e maratona de inovação com apresentação de projetos de engenharia.</span>
-                </li>
-                <li class="flex items-start gap-2.5">
-                  <i data-lucide="sparkle" class="w-4 h-4 text-[#00E599] shrink-0 mt-0.5"></i>
-                  <span><strong class="text-[#F1F5F9]">Semana Carreira Tech — FIAP:</strong> Painéis com líderes de tecnologia abordando tendências em arquitetura cloud, IA e empregabilidade de alta performance.</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         SECTION: CONTATO & CALL TO ACTION
-         ========================================================================= -->
-    <section id="contato" class="py-24 border-t border-white/10 bg-[#0B0F19] relative overflow-hidden">
-      <!-- Glow effect -->
-      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-72 bg-[#FF8A3D]/5 blur-3xl rounded-full pointer-events-none"></div>
-
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#161F30] border border-white/10 text-xs font-mono text-[#00E599] mb-6">
-          <span class="w-2 h-2 rounded-full bg-[#00E599] pulsing-dot"></span>
-          Disponível para projetos e conexões
-        </div>
-
-        <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#F1F5F9] tracking-tight mb-4">
-          Vamos construir soluções <br class="hidden sm:inline" />
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FF8A3D] to-[#38BDF8]">
-            inteligentes e automatizadas juntos?
-          </span>
-        </h2>
-
-        <p class="text-base sm:text-lg text-[#94A3B8] max-w-2xl mx-auto mb-10 leading-relaxed">
-          Tem um processo manual que consome tempo da sua equipe ou busca desenvolver APIs resilientes? Entre em contato e vamos conversar.
-        </p>
-
-        <!-- Interactive Contact Actions -->
-        <div class="glass-card rounded-2xl p-6 sm:p-8 max-w-xl mx-auto border border-white/10 space-y-6">
-          
-          <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <!-- Email 1-Click Copy Button -->
-            <button id="copy-email-btn" type="button" data-email="donizetti.dev@gmail.com"
-                    class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#FF8A3D] hover:bg-[#FF9D5C] text-white font-semibold text-sm transition-all shadow-lg shadow-[#FF8A3D]/25 flex items-center justify-center gap-2">
-              <i data-lucide="mail" class="w-4 h-4"></i>
-              <span>Copiar E-mail</span>
-            </button>
-
-            <!-- LinkedIn Direct Link -->
-            <a href="https://www.linkedin.com/in/donizetti-dev" target="_blank" rel="noopener noreferrer"
-               class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#161F30] hover:bg-[#1E2B42] text-[#F1F5F9] border border-white/10 font-semibold text-sm transition-all flex items-center justify-center gap-2">
-              <i data-lucide="linkedin" class="w-4 h-4 text-[#38BDF8]"></i>
-              <span>Abrir LinkedIn</span>
-            </a>
-          </div>
-
-          <div class="pt-4 border-t border-white/5 flex items-center justify-center gap-6 font-mono text-xs text-[#94A3B8]">
-            <a href="https://github.com/donizetti-dev" target="_blank" rel="noopener noreferrer" class="hover:text-white flex items-center gap-1.5 transition-colors">
-              <i data-lucide="github" class="w-4 h-4"></i>
-              <span>github.com/donizetti-dev</span>
-            </a>
-            <span class="text-white/20">•</span>
-            <span class="text-[#00E599] flex items-center gap-1">
-              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-              <span>Resposta em &lt; 24h</span>
-            </span>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-  </main>
-
-  <!-- =========================================================================
-       FOOTER (Terminal Status Console)
-       ========================================================================= -->
-  <footer class="border-t border-white/10 bg-[#070A12] py-8 text-xs font-mono text-[#94A3B8]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-      
-      <div>
-        <span class="text-[#F1F5F9] font-bold">Compiled with precision</span> • Designed for Donizetti • FIAP Checkpoint 6
-      </div>
-
-      <div class="flex items-center gap-3">
-        <span class="flex items-center gap-1.5 text-[#00E599]">
-          <span class="w-2 h-2 rounded-full bg-[#00E599]"></span>
-          All systems operational (200 OK)
-        </span>
-        <span class="text-white/20">|</span>
-        <a href="#" class="hover:text-white transition-colors">Top ↑</a>
-      </div>
-
-    </div>
-  </footer>
-
-  <!-- =========================================================================
-       TOAST NOTIFICATION COMPONENT
-       ========================================================================= -->
-  <div id="toast" class="toast-hide fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl bg-[#161F30] border border-[#FF8A3D]/40 text-[#F1F5F9] shadow-2xl font-mono text-xs">
-    <div class="w-2 h-2 rounded-full bg-[#00E599] shrink-0"></div>
-    <span id="toast-message">Operação executada com sucesso!</span>
-  </div>
-
-  <!-- JavaScript Script Initialization -->
-  <script src="assets/js/main.js"></script>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Entrada suave da página
+        gsap.fromTo('#page-wrapper', { y: -60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' });
+
+        // Transição de saída: Página atual "escorrega para baixo" antes de mudar de arquivo HTML
+        document.querySelectorAll('.page-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (!href || href === 'index.html') return;
+                e.preventDefault();
+                gsap.to('#page-wrapper', {
+                    y: '100vh',
+                    opacity: 0,
+                    duration: 0.65,
+                    ease: 'power3.inOut',
+                    onComplete: () => { window.location.href = href; }
+                });
+            });
+        });
+
+        // Custom Cursor
+        const dot = document.getElementById('cursor-dot');
+        const ring = document.getElementById('cursor-ring');
+        let mx = window.innerWidth / 2, my = window.innerHeight / 2, rx = mx, ry = my;
+        window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.left = mx+'px'; dot.style.top = my+'px'; });
+        function loopCursor() {
+            rx += (mx - rx) * 0.15; ry += (my - ry) * 0.15;
+            ring.style.left = rx+'px'; ring.style.top = ry+'px';
+            requestAnimationFrame(loopCursor);
+        }
+        loopCursor();
+        document.querySelectorAll('.interactable, a, .glass-card').forEach(el => {
+            el.addEventListener('mouseenter', () => { dot.classList.add('hovered'); ring.classList.add('hovered'); });
+            el.addEventListener('mouseleave', () => { dot.classList.remove('hovered'); ring.classList.remove('hovered'); });
+        });
+
+        // Three.js Shatter Monolith
+        const canvas = document.getElementById('webgl-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = 11;
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.65));
+        const dLight1 = new THREE.DirectionalLight(0xffffff, 2.5); dLight1.position.set(5, 8, 6); scene.add(dLight1);
+        const dLight2 = new THREE.DirectionalLight(0xaaaaaa, 1.8); dLight2.position.set(-6, -5, -4); scene.add(dLight2);
+
+        const mainGroup = new THREE.Group(); scene.add(mainGroup);
+        const innerCore = new THREE.Mesh(
+            new THREE.OctahedronGeometry(1.35, 2),
+            new THREE.MeshStandardMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.45 })
+        );
+        mainGroup.add(innerCore);
+
+        const shardCount = 65, shards = [];
+        const shardGeo = new THREE.OctahedronGeometry(0.65, 0);
+        const shardMat = new THREE.MeshPhysicalMaterial({ color: 0x2a2a2a, metalness: 0.35, roughness: 0.15, clearcoat: 1.0, flatShading: true });
+        const edgeMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
+
+        for (let i = 0; i < shardCount; i++) {
+            const mesh = new THREE.Mesh(shardGeo, shardMat);
+            mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(shardGeo), edgeMat));
+            const phi = Math.acos(1 - 2 * (i + 0.5) / shardCount);
+            const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+            const r = 1.2 + Math.random() * 0.6;
+            const bx = r * Math.sin(phi) * Math.cos(theta), by = r * Math.sin(phi) * Math.sin(theta), bz = r * Math.cos(phi);
+            mesh.position.set(bx, by, bz);
+            mesh.scale.set(0.5 + Math.random()*0.9, 0.5 + Math.random()*1.1, 0.5 + Math.random()*0.9);
+            const rx0 = Math.random()*Math.PI, ry0 = Math.random()*Math.PI;
+            mesh.rotation.set(rx0, ry0, 0);
+            shards.push({
+                mesh,
+                basePos: new THREE.Vector3(bx, by, bz),
+                explodeVec: new THREE.Vector3(bx, by, bz).normalize().multiplyScalar(4.5 + Math.random() * 7),
+                initRot: { x: rx0, y: ry0 },
+                rotSpeed: { x: (Math.random()-0.5)*6, y: (Math.random()-0.5)*6 }
+            });
+            mainGroup.add(mesh);
+        }
+
+        const scrollState = { progress: 0 };
+        const hudState = document.getElementById('hud-state');
+        ScrollTrigger.create({
+            trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: 1,
+            onUpdate: self => {
+                scrollState.progress = self.progress;
+                const pct = Math.round(self.progress * 100).toString().padStart(2, '0');
+                if (hudState) hudState.textContent = `${self.progress < 0.2 ? 'SOLID' : 'SHATTERED'} // ${pct}%`;
+            }
+        });
+
+        gsap.to('#marquee-1', { xPercent: -35, ease: 'none', scrollTrigger: { trigger: 'body', start: 'top top', end: '50% top', scrub: 1 } });
+        gsap.to('#marquee-2', { xPercent: 30, ease: 'none', scrollTrigger: { trigger: 'body', start: 'top top', end: '50% top', scrub: 1 } });
+        gsap.fromTo('#about-block', { y: 90, opacity: 0 }, { y: 0, opacity: 1, scrollTrigger: { trigger: '#about-block', start: 'top 88%', end: 'top 35%', scrub: 1 } });
+
+        const clock = new THREE.Clock();
+        function animate() {
+            const t = clock.getElapsedTime();
+            const sf = Math.min(scrollState.progress * 2.2, 1.35);
+            shards.forEach((s, i) => {
+                s.mesh.position.x = s.basePos.x + s.explodeVec.x * sf;
+                s.mesh.position.y = s.basePos.y + s.explodeVec.y * sf + Math.sin(t * 1.5 + i) * 0.08 * sf;
+                s.mesh.position.z = s.basePos.z + s.explodeVec.z * sf;
+                s.mesh.rotation.x = s.initRot.x + sf * s.rotSpeed.x + t * 0.15;
+                s.mesh.rotation.y = s.initRot.y + sf * s.rotSpeed.y + t * 0.15;
+            });
+            innerCore.rotation.y = -t * 0.4 - scrollState.progress * 5;
+            mainGroup.rotation.y += (((mx / window.innerWidth - 0.5) * 0.6) + t * 0.1 - mainGroup.rotation.y) * 0.05;
+            mainGroup.rotation.x += (((my / window.innerHeight - 0.5) * 0.6) - mainGroup.rotation.x) * 0.05;
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        animate();
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 </body>
 </html>
-

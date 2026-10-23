@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfólio | Projetos & Engenharia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Syne', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        body { background-color: #000000; color: #FFFFFF; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #555; }
+        ::-webkit-scrollbar-thumb:hover { background: #fff; }
+
+        #cursor-dot {
+            width: 8px; height: 8px; background: #fff; border-radius: 50%;
+            position: fixed; pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s;
+            mix-blend-mode: difference;
+        }
+        #cursor-ring {
+            width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998;
+            transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s, background-color 0.3s;
+            mix-blend-mode: difference;
+        }
+        body:hover #cursor-dot.hovered { width: 0; height: 0; }
+        body:hover #cursor-ring.hovered { width: 70px; height: 70px; background-color: #fff; }
+
+        #webgl-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
+        .vignette { position: fixed; inset: 0; pointer-events: none; z-index: 2; background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.85) 100%); }
+        .grid-bg {
+            background-size: 60px 60px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+        }
+        .content-layer { position: relative; z-index: 10; }
+        .text-outline { color: transparent; -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.35); }
+
+        .glass-card {
+            background: rgba(32, 32, 32, 0.80);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+            transition: border-color 0.4s ease;
+        }
+        .glass-card:hover { border-color: rgba(255, 255, 255, 0.9); }
+
+        /* 3D Fracture Split System */
+        .fracture-wrapper { position: relative; perspective: 1400px; }
+        .fracture-half-top {
+            clip-path: polygon(0 0, 100% 0, 100% 58%, 75% 44%, 50% 56%, 25% 42%, 0 54%);
+            will-change: transform, opacity;
+        }
+        .fracture-half-bottom {
+            position: absolute; inset: 0;
+            clip-path: polygon(0 53.5%, 25% 41.5%, 50% 55.5%, 75% 43.5%, 100% 57.5%, 100% 100%, 0 100%);
+            will-change: transform, opacity;
+        }
+
+        #page-wrapper { will-change: transform, opacity; }
+    </style>
+</head>
+<body class="grid-bg">
+
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
+    <canvas id="webgl-canvas"></canvas>
+    <div class="vignette"></div>
+
+    <!-- Header Navigation -->
+    <header class="fixed top-0 left-0 w-full z-50 px-6 md:px-12 py-6 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/15">
+        <a href="index.html" class="page-link flex items-center gap-3 interactable">
+            <div class="w-3 h-3 bg-white rotate-45 animate-pulse"></div>
+            <span class="font-display font-extrabold tracking-tighter text-xl md:text-2xl">DEV.RPA</span>
+        </a>
+
+        <nav class="flex items-center gap-6 md:gap-10 font-mono text-xs uppercase tracking-[0.22em]">
+            <a href="index.html" class="page-link interactable text-white/70 hover:text-white transition-all pb-1">01 // Sobre</a>
+            <a href="projects.html" class="page-link interactable text-white font-bold border-b-2 border-white pb-1">02 // Projetos</a>
+            <a href="skills.html" class="page-link interactable text-white/70 hover:text-white transition-all pb-1">03 // Skills</a>
+        </nav>
+
+        <div class="hidden sm:flex font-mono text-xs tracking-widest text-white/80 items-center gap-2">
+            <span>MODULE:</span>
+            <span class="text-white font-bold px-2.5 py-1 bg-white/10 border border-white/30">FRACTURE_ENGINE</span>
+        </div>
+    </header>
+
+    <!-- Page Wrapper -->
+    <div id="page-wrapper" class="content-layer pt-36 pb-28 px-6 md:px-16">
+        <div class="max-w-5xl mx-auto">
+            
+            <div class="mb-24 flex flex-col md:flex-row md:items-end justify-between border-b border-white/20 pb-8">
+                <div>
+                    <span class="font-mono text-xs uppercase tracking-[0.3em] text-white/70 block mb-3">
+                        02 // ENGENHARIA & CASES (SEM FOTOS — FOCO EM ARQUITETURA)
+                    </span>
+                    <h1 class="font-display text-5xl md:text-7xl font-extrabold tracking-tighter">
+                        PROJETOS <span class="text-outline">SELECIONADOS</span>
+                    </h1>
+                </div>
+                <p class="font-mono text-xs text-white/70 max-w-xs mt-4 md:mt-0">
+                    * Role a página: cada card se parte ao meio ao sair do campo de visão e se reconstrói no centro da tela.
+                </p>
+            </div>
+
+            <!-- 5 Projects (Pure Typography & Tech Architecture, No Photo Placeholders) -->
+            <div class="space-y-24">
+
+                <!-- 1. News Scraper API -->
+                <div class="project-fracture-item">
+                    <div class="glass-card p-8 md:p-12 space-y-6">
+                        <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-white/70 border-b border-white/15 pb-4">
+                            <span>PROJETO // 01</span>
+                            <span>WEB SCRAPING • REST API • SQL SERVER</span>
+                        </div>
+                        <h2 class="font-display text-3xl md:text-5xl font-bold tracking-tight">News Scraper API</h2>
+                        <p class="text-white/85 text-base md:text-lg leading-relaxed">
+                            API desenvolvida para coletar, armazenar e disponibilizar notícias do G1, com endpoints para consulta, pesquisa por título e acesso individual às notícias.
+                        </p>
+                        <div class="flex flex-wrap gap-2.5 pt-2 font-mono text-xs">
+                            <span class="px-3.5 py-1.5 bg-white text-black font-bold">Python</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">Flask</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">Selenium</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">SQL Server</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">pyodbc</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">REST API</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Trending Movies -->
+                <div class="project-fracture-item">
+                    <div class="glass-card p-8 md:p-12 space-y-6">
+                        <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-white/70 border-b border-white/15 pb-4">
+                            <span>PROJETO // 02</span>
+                            <span>FRONT-END • SPEC-DRIVEN DEVELOPMENT</span>
+                        </div>
+                        <h2 class="font-display text-3xl md:text-5xl font-bold tracking-tight">Trending Movies</h2>
+                        <p class="text-white/85 text-base md:text-lg leading-relaxed">
+                            Aplicação web desenvolvida para exibir filmes e séries em alta, consumindo dados da API do TMDB e utilizando conceitos de desenvolvimento orientado por especificações (Spec-Driven Development).
+                        </p>
+                        <div class="flex flex-wrap gap-2.5 pt-2 font-mono text-xs">
+                            <span class="px-3.5 py-1.5 bg-white text-black font-bold">React</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">JavaScript</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">API REST</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">TMDB</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">Vercel</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Assistente de IA com Gemini -->
+                <div class="project-fracture-item">
+                    <div class="glass-card p-8 md:p-12 space-y-6">
+                        <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-white/70 border-b border-white/15 pb-4">
+                            <span>PROJETO // 03</span>
+                            <span>IA GENERATIVA • FASTAPI • DOC PROCESSING</span>
+                        </div>
+                        <h2 class="font-display text-3xl md:text-5xl font-bold tracking-tight">Assistente de IA com Gemini</h2>
+                        <p class="text-white/85 text-base md:text-lg leading-relaxed">
+                            Aplicação de inteligência artificial capaz de responder perguntas com base em documentos institucionais, utilizando uma API de IA generativa para interpretar as solicitações dos usuários.
+                        </p>
+                        <div class="flex flex-wrap gap-2.5 pt-2 font-mono text-xs">
+                            <span class="px-3.5 py-1.5 bg-white text-black font-bold">Python</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">FastAPI</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">Gemini API</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">Processamento de Documentos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. InfraWatch — FIAP Global Solution -->
+                <div class="project-fracture-item">
+                    <div class="glass-card p-8 md:p-12 space-y-6">
+                        <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-white/70 border-b border-white/15 pb-4">
+                            <span>PROJETO // 04</span>
+                            <span>FIAP GLOBAL SOLUTION • DADOS ORBITAIS & SENSORES</span>
+                        </div>
+                        <h2 class="font-display text-3xl md:text-5xl font-bold tracking-tight">InfraWatch — FIAP Global Solution</h2>
+                        <p class="text-white/85 text-base md:text-lg leading-relaxed">
+                            Projeto acadêmico voltado ao monitoramento de condições ambientais e análise de dados, combinando informações de sensores e dados orbitais para apoiar o acompanhamento de cenários de risco.
+                        </p>
+                        <div class="flex flex-wrap gap-2.5 pt-2 font-mono text-xs">
+                            <span class="px-3.5 py-1.5 bg-white text-black font-bold">Python</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">Processamento de Dados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Automações RPA — MV3 Tecnologia -->
+                <div class="project-fracture-item">
+                    <div class="glass-card p-8 md:p-12 space-y-6">
+                        <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-white/70 border-b border-white/15 pb-4">
+                            <span>PROJETO // 05</span>
+                            <span>ENTERPRISE RPA • SUSTENTAÇÃO & INTEGRAÇÃO</span>
+                        </div>
+                        <h2 class="font-display text-3xl md:text-5xl font-bold tracking-tight">Automações RPA — MV3 Tecnologia</h2>
+                        <p class="text-white/85 text-base md:text-lg leading-relaxed">
+                            Desenvolvimento e sustentação de robôs para automatização de processos empresariais, envolvendo navegação web, extração e processamento de documentos, consultas a bancos de dados e integração entre sistemas.
+                        </p>
+                        <div class="flex flex-wrap gap-2.5 pt-2 font-mono text-xs">
+                            <span class="px-3.5 py-1.5 bg-white text-black font-bold">Python</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">SQL Server</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">AutoMate Desktop</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">Power Automate Desktop</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">Selenium</span>
+                            <span class="px-3.5 py-1.5 bg-white/10 border border-white/30">PowerShell</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mt-24 flex justify-between items-center border-t border-white/20 pt-10">
+                <a href="index.html" class="page-link interactable px-6 py-3 border border-white/40 font-mono text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-all">
+                    ← Voltar para Sobre (01)
+                </a>
+                <a href="skills.html" class="page-link interactable px-8 py-4 bg-white text-black font-mono text-xs font-bold uppercase tracking-widest hover:bg-white/80 transition-all">
+                    Avançar para Matriz de Skills (03) →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Entrada e Saída ("Escorregar para baixo")
+        gsap.fromTo('#page-wrapper', { y: -60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' });
+        document.querySelectorAll('.page-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (!href || href === 'projects.html') return;
+                e.preventDefault();
+                gsap.to('#page-wrapper', {
+                    y: '100vh', opacity: 0, duration: 0.65, ease: 'power3.inOut',
+                    onComplete: () => { window.location.href = href; }
+                });
+            });
+        });
+
+        // Custom Cursor
+        const dot = document.getElementById('cursor-dot'), ring = document.getElementById('cursor-ring');
+        let mx = window.innerWidth/2, my = window.innerHeight/2, rx = mx, ry = my;
+        window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.left = mx+'px'; dot.style.top = my+'px'; });
+        function loopCursor() { rx += (mx - rx)*0.15; ry += (my - ry)*0.15; ring.style.left = rx+'px'; ring.style.top = ry+'px'; requestAnimationFrame(loopCursor); }
+        loopCursor();
+        document.querySelectorAll('.interactable, a, .glass-card').forEach(el => {
+            el.addEventListener('mouseenter', () => { dot.classList.add('hovered'); ring.classList.add('hovered'); });
+            el.addEventListener('mouseleave', () => { dot.classList.remove('hovered'); ring.classList.remove('hovered'); });
+        });
+
+        // Fracture Cards Engine (Quebra ao meio no Scroll)
+        document.querySelectorAll('.project-fracture-item').forEach((item) => {
+            const html = item.innerHTML;
+            item.classList.add('fracture-wrapper');
+            item.innerHTML = `<div class="fracture-half-top">${html}</div><div class="fracture-half-bottom" aria-hidden="true">${html}</div>`;
+            const topHalf = item.querySelector('.fracture-half-top');
+            const bottomHalf = item.querySelector('.fracture-half-bottom');
+
+            gsap.timeline({
+                scrollTrigger: { trigger: item, start: 'top 95%', end: 'bottom 5%', scrub: 0.7 }
+            })
+            .fromTo(topHalf, { x: -110, y: -55, rotationZ: -7, rotationX: 20, opacity: 0.1 }, { x: 0, y: 0, rotationZ: 0, rotationX: 0, opacity: 1, duration: 0.35 }, 0)
+            .fromTo(bottomHalf, { x: 110, y: 55, rotationZ: 7, rotationX: -20, opacity: 0.1 }, { x: 0, y: 0, rotationZ: 0, rotationX: 0, opacity: 1, duration: 0.35 }, 0)
+            .to([topHalf, bottomHalf], { x: 0, y: 0, rotationZ: 0, opacity: 1, duration: 0.3 })
+            .to(topHalf, { x: 110, y: -55, rotationZ: 7, rotationX: -20, opacity: 0.1, duration: 0.35 })
+            .to(bottomHalf, { x: -110, y: 55, rotationZ: -7, rotationX: 20, opacity: 0.1, duration: 0.35 }, '<');
+        });
+
+        // Background 3D Floating Shards
+        const canvas = document.getElementById('webgl-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100);
+        camera.position.z = 12;
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const dLight = new THREE.DirectionalLight(0xffffff, 2); dLight.position.set(5, 8, 6); scene.add(dLight);
+        const group = new THREE.Group(); scene.add(group);
+        const geo = new THREE.OctahedronGeometry(0.5, 0);
+        const mat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.2, metalness: 0.5, flatShading: true });
+        const edgeMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4 });
+
+        for (let i = 0; i < 45; i++) {
+            const m = new THREE.Mesh(geo, mat);
+            m.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo), edgeMat));
+            m.position.set((Math.random()-0.5)*18, (Math.random()-0.5)*14, (Math.random()-0.5)*8);
+            m.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
+            group.add(m);
+        }
+        const clock = new THREE.Clock();
+        function animate() {
+            const t = clock.getElapsedTime();
+            group.rotation.y = t * 0.06 + (mx / window.innerWidth - 0.5) * 0.3;
+            group.rotation.x = (my / window.innerHeight - 0.5) * 0.3;
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
